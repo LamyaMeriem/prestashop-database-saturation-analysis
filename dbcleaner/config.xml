@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+    <name>dbcleaner</name>
+    <displayName><![CDATA[Database Cleaner]]></displayName>
+    <version><![CDATA[1.0.0]]></version>
+    <description><![CDATA[Cleans old connection and guest data from the database.]]></description>
+    <author><![CDATA[Mr-dev]]></author>
+    <tab><![CDATA[administration]]></tab>
+    <is_configurable>1</is_configurable>
+    <need_instance>0</need_instance>
+	<ps_versions_compliancy>
+		<min>1.7.0.0</min>
+		<max>_PS_VERSION_</max>
+	</ps_versions_compliancy>
+</module>
