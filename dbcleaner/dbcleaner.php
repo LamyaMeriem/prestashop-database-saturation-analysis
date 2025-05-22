@@ -31,49 +31,26 @@ class DbCleaner extends Module
     $this->confirmUninstall = $this->l('Are you sure you want to uninstall this module?');
   }
 
-  /**
-   * Installation method.
-   *
-   * @return bool Success or failure
-   */
   public function install()
   {
-    // Install default configuration, register hooks, etc.
     return parent::install() && $this->generateCronToken();
   }
 
-  /**
-   * Uninstallation method.
-   *
-   * @return bool Success or failure
-   */
   public function uninstall()
   {
-    // Remove configuration, unregister hooks, etc.
     Configuration::deleteByName('DBCLEANER_CRON_TOKEN');
     return parent::uninstall();
   }
 
-  /**
-   * Generate and save a secure token for the cron job.
-   *
-   * @return bool
-   */
   protected function generateCronToken()
   {
     $token = Tools::passwdGen(32);
     return Configuration::updateValue('DBCLEANER_CRON_TOKEN', $token);
   }
 
-  /**
-   * Module configuration page content.
-   *
-   * @return string HTML content
-   */
   public function getContent()
   {
     $output = '';
-    // Handle form submission for manual cleaning
     if (Tools::isSubmit('submitDbCleanManual')) {
       if ($this->runCleanup()) {
         $output .= $this->displayConfirmation($this->l('Database tables cleaned successfully.'));
@@ -85,11 +62,6 @@ class DbCleaner extends Module
     return $output . $this->renderConfigurationForm();
   }
 
-  /**
-   * Renders the configuration form.
-   *
-   * @return string HTML form
-   */
   public function renderConfigurationForm()
   {
     $cron_url = $this->context->link->getModuleLink(
@@ -152,27 +124,19 @@ class DbCleaner extends Module
     return $helper->generateForm($fields_form);
   }
 
-  /**
-   * Executes the database cleaning queries.
-   *
-   * @return bool True on success, false on failure.
-   */
   public function runCleanup()
   {
     $success = true;
     $db = Db::getInstance();
 
     try {
-      // Delete old connections (older than 2 days)
       $sql1 = 'DELETE FROM `' . _DB_PREFIX_ . 'connections` WHERE `date_add` < DATE_SUB(NOW(), INTERVAL 1 DAY)';
       if (!$db->execute($sql1)) {
         PrestaShopLogger::addLog('DbCleaner: Failed to execute query: ' . $sql1 . ' - Error: ' . $db->getMsgError(), 3);
         $success = false;
       }
 
-      // Delete connection sources orphaned from connections
       $sql2 = 'DELETE FROM `' . _DB_PREFIX_ . 'connections_source` WHERE `id_connections` NOT IN (SELECT `id_connections` FROM `' . _DB_PREFIX_ . 'connections`)';
-      // Check if the previous query succeeded before running this potentially large delete
       if ($success && !$db->execute($sql2)) {
         PrestaShopLogger::addLog('DbCleaner: Failed to execute query: ' . $sql2 . ' - Error: ' . $db->getMsgError(), 3);
         $success = false;
