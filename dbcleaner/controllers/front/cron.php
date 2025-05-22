@@ -13,7 +13,6 @@ class DbCleanerCronModuleFrontController extends ModuleFrontController
   {
     parent::init();
 
-    // Security check: Validate the token
     $token = Tools::getValue('token');
     $stored_token = Configuration::get('DBCLEANER_CRON_TOKEN');
 
@@ -24,8 +23,7 @@ class DbCleanerCronModuleFrontController extends ModuleFrontController
       exit;
     }
 
-    // Execute the cleanup
-    /** @var DbCleaner $module */
+
     $module = $this->module;
     if ($module instanceof DbCleaner) {
       if ($module->runCleanup()) {
